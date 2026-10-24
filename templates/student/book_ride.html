@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Ride | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner booking-banner">
+        <div>
+            <span class="section-label">Ride Booking</span>
+            <h1>Book a campus Keke ride</h1>
+            <p>
+                Select your pickup location, destination, preferred time, and payment method.
+                The system will automatically assign a verified available driver.
+            </p>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="booking-layout">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <span class="section-label">Request Details</span>
+                    <h2>Ride Information</h2>
+                </div>
+                <span class="pill">Auto Assignment</span>
+            </div>
+
+            <form method="POST" class="auth-form">
+                {% csrf_token %}
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Pickup Location</label>
+                        {{ form.pickup_location }}
+                        {{ form.pickup_location.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Destination</label>
+                        {{ form.destination }}
+                        {{ form.destination.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preferred Time</label>
+                        {{ form.preferred_time }}
+                        {{ form.preferred_time.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Number of Passengers</label>
+                        {{ form.number_of_passengers }}
+                        {{ form.number_of_passengers.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        {{ form.payment_method }}
+                        {{ form.payment_method.errors }}
+                    </div>
+                </div>
+
+                {{ form.non_field_errors }}
+
+                <button type="submit" class="btn btn-primary full-width">Find Driver & Book Ride</button>
+            </form>
+        </div>
+
+        <aside class="panel booking-help">
+            <span class="section-label">How it works</span>
+
+            <div class="step-list">
+                <div class="step-item">
+                    <span>01</span>
+                    <div>
+                        <strong>Select route</strong>
+                        <p>Choose pickup and destination within approved campus locations.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <span>02</span>
+                    <div>
+                        <strong>Driver assigned</strong>
+                        <p>The system assigns the nearest available verified driver.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <span>03</span>
+                    <div>
+                        <strong>Track status</strong>
+                        <p>Monitor the ride status from assigned to completed.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <span>04</span>
+                    <div>
+                        <strong>Payment recorded</strong>
+                        <p>Your fare and payment method are saved for accountability.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

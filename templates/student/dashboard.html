@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Student Dashboard</span>
+            <h1>Welcome back, {{ request.user.first_name }}</h1>
+            <p>
+                Book verified Keke Napep rides, monitor your current trip, and view your ride records
+                from one simple dashboard.
+            </p>
+        </div>
+
+        <div class="banner-action">
+            <a href="{% url 'book_ride' %}" class="btn btn-primary">Book a Ride</a>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="overview-grid">
+        <article class="overview-card">
+            <span class="card-label">Matric Number</span>
+            <h3>{{ student.matric_number }}</h3>
+            <p>Registered student identity</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Department</span>
+            <h3>{{ student.department }}</h3>
+            <p>Academic profile</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Account Status</span>
+            {% if student.is_verified %}
+                <h3 class="status-success">Verified</h3>
+                <p>Eligible to book rides</p>
+            {% else %}
+                <h3 class="status-warning">Pending</h3>
+                <p>Awaiting approval</p>
+            {% endif %}
+        </article>
+
+        <article class="overview-card highlight-card">
+            <span class="card-label">Quick Fare Estimate</span>
+            <h3>₦300 - ₦800</h3>
+            <p>Based on campus pickup and destination</p>
+        </article>
+    </div>
+
+    <div class="dashboard-columns">
+        <div class="main-column">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Current Trip</span>
+                        <h2>Active Ride</h2>
+                    </div>
+                    <span class="pill">Live Status</span>
+                </div>
+
+                {% if active_ride %}
+                    <div class="active-ride-card">
+                        <div class="route-line">
+                            <div class="route-point start"></div>
+                            <div class="route-bar"></div>
+                            <div class="route-point end"></div>
+                        </div>
+
+                        <div class="ride-details">
+                            <div>
+                                <small>Pickup Location</small>
+                                <strong>{{ active_ride.pickup_location }}</strong>
+                            </div>
+
+                            <div>
+                                <small>Destination</small>
+                                <strong>{{ active_ride.destination }}</strong>
+                            </div>
+
+                            <div>
+                                <small>Status</small>
+                                <strong>{{ active_ride.get_status_display }}</strong>
+                            </div>
+
+                            <div>
+                                <small>Estimated Fare</small>
+                                <strong>₦{{ active_ride.estimated_fare }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ride-actions">
+                        <a href="{% url 'ride_detail' active_ride.id %}" class="btn btn-primary">View Ride Details</a>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>No active ride</h3>
+                        <p>You have not booked any ride yet. Start by requesting a verified campus Keke ride.</p>
+                        <a href="{% url 'book_ride' %}" class="btn btn-primary">Book a Ride</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="panel recent-rides-panel">
+                <div class="recent-rides-header">
+                    <div>
+                        <span class="section-label">Recent Activity</span>
+                        <h2>Recent Rides</h2>
+                    </div>
+
+                    <a href="{% url 'student_ride_history' %}" class="text-link">View all</a>
+                </div>
+
+                {% if recent_rides %}
+                    <div class="recent-rides-grid">
+                        {% for ride in recent_rides %}
+                            <a href="{% url 'ride_detail' ride.id %}" class="recent-ride-card">
+                                <div class="recent-route-info">
+                                    <strong>{{ ride.pickup_location }}</strong>
+                                    <span>to {{ ride.destination }}</span>
+                                </div>
+
+                                <div class="recent-ride-meta">
+                                    <small>{{ ride.date_booked|date:"M d, Y" }}</small>
+                                    <span class="recent-status {{ ride.status }}">
+                                        {{ ride.get_status_display }}
+                                    </span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state small">
+                        <h3>No recent rides</h3>
+                        <p>Your latest rides will appear here after booking.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <aside class="side-column">
+            <div class="panel">
+                <span class="section-label">Profile</span>
+
+                <div class="profile-card">
+                    <div class="large-avatar">
+                        {{ request.user.first_name|first|default:request.user.username|first }}
+                    </div>
+                    <h3>{{ request.user.get_full_name }}</h3>
+                    <p>{{ student.department }}</p>
+                </div>
+
+                <div class="profile-meta">
+                    <div>
+                        <small>Phone</small>
+                        <strong>{{ student.phone_number }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Hostel/Lodge</small>
+                        <strong>{{ student.hostel_or_lodge|default:"Not provided" }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Level</small>
+                        <strong>{{ student.level|default:"Not provided" }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel safety-panel">
+                <span class="section-label">Safety Notice</span>
+                <h3>Ride with verified drivers only</h3>
+                <p>
+                    Always confirm the driver's name and Keke plate number before entering the vehicle.
+                </p>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

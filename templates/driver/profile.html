@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Driver Profile | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Driver Profile</span>
+            <h1>Manage your driver account</h1>
+            <p>
+                Update your contact details, current location, and vehicle information for better ride assignment.
+            </p>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="dashboard-columns">
+        <div class="main-column">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Profile Form</span>
+                        <h2>Update Information</h2>
+                    </div>
+                </div>
+
+                <form method="POST" class="auth-form">
+                    {% csrf_token %}
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" class="form-control" value="{{ request.user.email }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" name="phone_number" class="form-control" value="{{ driver.phone_number }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Vehicle Color</label>
+                            <input type="text" name="vehicle_color" class="form-control" value="{{ driver.vehicle_color }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Current Location</label>
+                            <select name="current_location" class="form-control" required>
+                                <option value="Campus Main Gate" {% if driver.current_location == "Campus Main Gate" %}selected{% endif %}>Campus Main Gate</option>
+                                <option value="Senate Building" {% if driver.current_location == "Senate Building" %}selected{% endif %}>Senate Building</option>
+                                <option value="ICT Centre" {% if driver.current_location == "ICT Centre" %}selected{% endif %}>ICT Centre</option>
+                                <option value="Library" {% if driver.current_location == "Library" %}selected{% endif %}>Library</option>
+                                <option value="Faculty of Science" {% if driver.current_location == "Faculty of Science" %}selected{% endif %}>Faculty of Science</option>
+                                <option value="Faculty of Arts" {% if driver.current_location == "Faculty of Arts" %}selected{% endif %}>Faculty of Arts</option>
+                                <option value="Faculty of Education" {% if driver.current_location == "Faculty of Education" %}selected{% endif %}>Faculty of Education</option>
+                                <option value="Student Affairs" {% if driver.current_location == "Student Affairs" %}selected{% endif %}>Student Affairs</option>
+                                <option value="Medical Centre" {% if driver.current_location == "Medical Centre" %}selected{% endif %}>Medical Centre</option>
+                                <option value="School Hostel" {% if driver.current_location == "School Hostel" %}selected{% endif %}>School Hostel</option>
+                                <option value="Permanent Site" {% if driver.current_location == "Permanent Site" %}selected{% endif %}>Permanent Site</option>
+                                <option value="Take-Off Site" {% if driver.current_location == "Take-Off Site" %}selected{% endif %}>Take-Off Site</option>
+                                <option value="Mararaba Akunza Lodge Area" {% if driver.current_location == "Mararaba Akunza Lodge Area" %}selected{% endif %}>Mararaba Akunza Lodge Area</option>
+                                <option value="Bukan Sidi Lodge Area" {% if driver.current_location == "Bukan Sidi Lodge Area" %}selected{% endif %}>Bukan Sidi Lodge Area</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary full-width">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <aside class="side-column">
+            <div class="panel">
+                <span class="section-label">Driver Summary</span>
+
+                <div class="profile-card">
+                    <div class="large-avatar">
+                        {{ request.user.first_name|first|default:request.user.username|first }}
+                    </div>
+
+                    <h3>{{ request.user.get_full_name }}</h3>
+                    <p>{{ driver.keke_plate_number }}</p>
+                </div>
+
+                <div class="profile-meta">
+                    <div>
+                        <small>Driver ID</small>
+                        <strong>{{ driver.driver_id }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Availability</small>
+                        {% if driver.is_available %}
+                            <strong class="status-success">Available</strong>
+                        {% else %}
+                            <strong class="status-warning">Busy/Offline</strong>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <small>Verification</small>
+                        {% if driver.is_verified %}
+                            <strong class="status-success">Verified</strong>
+                        {% else %}
+                            <strong class="status-warning">Pending</strong>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <small>Completed Rides</small>
+                        <strong>{{ driver.total_completed_rides }}</strong>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

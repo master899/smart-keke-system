@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports | Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Reports and Analytics</span>
+            <h1>System Performance Reports</h1>
+            <p>Analyze ride usage, completed trips, cancelled requests, revenue, and popular routes.</p>
+        </div>
+    </div>
+
+    <div class="admin-stats-grid">
+        <article class="overview-card">
+            <span class="card-label">Total Rides</span>
+            <h3>{{ total_rides }}</h3>
+            <p>All booking records</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Active Rides</span>
+            <h3>{{ active_rides }}</h3>
+            <p>Currently ongoing</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Completed Rides</span>
+            <h3 class="status-success">{{ completed_rides }}</h3>
+            <p>Successful trips</p>
+        </article>
+
+        <article class="overview-card highlight-card">
+            <span class="card-label">Total Revenue</span>
+            <h3>₦{{ total_revenue }}</h3>
+            <p>Paid ride records</p>
+        </article>
+    </div>
+
+    <div class="dashboard-columns">
+        <div class="main-column">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Popular Pickup Points</span>
+                        <h2>Top Pickup Locations</h2>
+                    </div>
+                </div>
+
+                {% if top_pickups %}
+                    <div class="analytics-list">
+                        {% for item in top_pickups %}
+                            <div class="analytics-item">
+                                <span>{{ item.pickup_location }}</span>
+                                <strong>{{ item.total }} ride(s)</strong>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state small">
+                        <h3>No pickup data yet</h3>
+                        <p>Pickup analytics will appear after ride bookings.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Popular Destinations</span>
+                        <h2>Top Destination Locations</h2>
+                    </div>
+                </div>
+
+                {% if top_destinations %}
+                    <div class="analytics-list">
+                        {% for item in top_destinations %}
+                            <div class="analytics-item">
+                                <span>{{ item.destination }}</span>
+                                <strong>{{ item.total }} ride(s)</strong>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state small">
+                        <h3>No destination data yet</h3>
+                        <p>Destination analytics will appear after ride bookings.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <aside class="side-column">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Driver Performance</span>
+                        <h2>Top Drivers</h2>
+                    </div>
+                </div>
+
+                {% if driver_performance %}
+                    <div class="analytics-list">
+                        {% for driver in driver_performance %}
+                            <div class="analytics-item">
+                                <span>{{ driver.user.get_full_name }}</span>
+                                <strong>{{ driver.total_completed_rides }} ride(s)</strong>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state small">
+                        <h3>No driver data yet</h3>
+                        <p>Driver performance data will appear after completed rides.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="panel safety-panel">
+                <span class="section-label">Cancelled Rides</span>
+                <h3>{{ cancelled_rides }} cancelled ride(s)</h3>
+                <p>
+                    Cancelled ride data helps administrators understand transport issues and improve service reliability.
+                </p>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

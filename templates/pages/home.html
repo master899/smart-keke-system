@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <p class="badge">FULafia Campus Transport</p>
+        <h1>Smart Campus Keke Booking System</h1>
+        <p>
+            Book verified Keke Napep rides, track ride status, and move around campus safely.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="{% url 'login' %}" class="btn btn-primary">Get Started</a>
+            <a href="#" class="btn btn-secondary">Learn More</a>
+        </div>
+    </div>
+
+    <div class="hero-card">
+        <div class="keke-icon"></div>
+        <h3>Fast Campus Ride</h3>
+        <p>Status: Driver Available</p>
+        <span>ETA: 5 mins</span>
+    </div>
+</section>
+{% endblock %}

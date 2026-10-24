@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Ride Bookings | Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Ride Management</span>
+            <h1>Ride Bookings</h1>
+            <p>Monitor student ride requests, assigned drivers, trip status, and fare records.</p>
+        </div>
+    </div>
+
+    <div class="panel history-filter-panel">
+        <form method="GET" class="filter-form">
+            <div class="form-group">
+                <label>Search Ride</label>
+                <input type="text" name="q" class="form-control" value="{{ search_query }}" placeholder="Student, driver, pickup, destination">
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="">All Rides</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Apply</button>
+            <a href="{% url 'admin_rides' %}" class="btn btn-secondary">Reset</a>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Bookings</span>
+                <h2>Ride Records</h2>
+            </div>
+            <span class="pill">{{ rides.count }} Record(s)</span>
+        </div>
+
+        {% if rides %}
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Driver</th>
+                            <th>Route</th>
+                            <th>Fare</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for ride in rides %}
+                            <tr>
+                                <td>
+                                    <strong>{{ ride.student.user.get_full_name }}</strong>
+                                    <small>{{ ride.student.matric_number }}</small>
+                                </td>
+
+                                <td>
+                                    {% if ride.driver %}
+                                        <strong>{{ ride.driver.user.get_full_name }}</strong>
+                                        <small>{{ ride.driver.keke_plate_number }}</small>
+                                    {% else %}
+                                        <strong>Not assigned</strong>
+                                        <small>Pending</small>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <strong>{{ ride.pickup_location }}</strong>
+                                    <small>to {{ ride.destination }}</small>
+                                </td>
+
+                                <td>
+                                    <strong>₦{{ ride.estimated_fare }}</strong>
+                                    <small>{{ ride.estimated_distance_km }} km</small>
+                                </td>
+
+                                <td>
+                                    {% if ride.payment %}
+                                        <span class="status-badge {{ ride.payment.status }}">{{ ride.payment.get_status_display }}</span>
+                                    {% else %}
+                                        <span class="status-badge pending">No Record</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <span class="status-badge {{ ride.status }}">{{ ride.get_status_display }}</span>
+                                </td>
+
+                                <td>
+                                    <strong>{{ ride.date_booked|date:"M d, Y" }}</strong>
+                                    <small>{{ ride.date_booked|date:"h:i A" }}</small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No rides found</h3>
+                <p>No ride record matches your filter.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

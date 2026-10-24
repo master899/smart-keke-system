@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Notifications</span>
+            <h1>System alerts</h1>
+            <p>
+                View ride confirmations, payment updates, cancellation alerts, and trip status messages.
+            </p>
+        </div>
+
+        {% if unread_count > 0 %}
+            <div class="banner-action">
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Mark All as Read</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Inbox</span>
+                <h2>Your Notifications</h2>
+            </div>
+
+            <span class="pill">{{ unread_count }} Unread</span>
+        </div>
+
+        {% if notifications %}
+            <div class="notification-list">
+                {% for notification in notifications %}
+                    <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+                        <div>
+                            <strong>{{ notification.title }}</strong>
+                            <p>{{ notification.message }}</p>
+                            <small>{{ notification.date_created|date:"M d, Y - h:i A" }}</small>
+                        </div>
+
+                        {% if not notification.is_read %}
+                            <span class="unread-dot"></span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No notifications yet</h3>
+                <p>Your booking and payment alerts will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

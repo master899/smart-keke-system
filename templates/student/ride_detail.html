@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}Ride Details | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Ride Details</span>
+            <h1>{{ ride.pickup_location }} to {{ ride.destination }}</h1>
+            <p>
+                View assigned driver, estimated fare, payment method, and current ride status.
+            </p>
+        </div>
+
+        {% if ride.status != "completed" and ride.status != "cancelled" and request.user.student_profile %}
+            <div class="banner-action">
+                <a href="{% url 'cancel_ride' ride.id %}" class="btn btn-secondary">Cancel Ride</a>
+            </div>
+
+            {% if ride.driver %}
+                <div class="panel leaflet-map-panel">
+                    <div class="panel-header">
+                        <div>
+                            <span class="section-label">Live Map</span>
+                            <h2>Driver GPS Tracking</h2>
+                        </div>
+
+                        <div class="map-panel-actions">
+                            <span class="pill" id="leafletTrackingStatus">Preparing map</span>
+                            <button type="button" class="map-maximize-btn" id="maximizeMapBtn">
+                                Maximize
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="rideLeafletMap" class="ride-leaflet-map"></div>
+
+                    <div class="map-legend">
+                        <span><b class="legend-driver"></b> Driver</span>
+                        <span><b class="legend-pickup"></b> Pickup</span>
+                        <span><b class="legend-destination"></b> Destination</span>
+                    </div>
+                </div>
+
+                {{ ride_map_data|json_script:"ride-map-data" }}
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="dashboard-columns">
+        <div class="main-column">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Trip Progress</span>
+                        <h2>{{ ride.get_status_display }}</h2>
+                    </div>
+                    <span class="pill">ETA: {{ ride.estimated_eta_minutes }} mins</span>
+                </div>
+
+                <div class="active-ride-card">
+                    <div class="route-line">
+                        <div class="route-point start"></div>
+                        <div class="route-bar"></div>
+                        <div class="route-point end"></div>
+                    </div>
+
+                    <div class="ride-details">
+                        <div>
+                            <small>Pickup Location</small>
+                            <strong>{{ ride.pickup_location }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Destination</small>
+                            <strong>{{ ride.destination }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Preferred Time</small>
+                            <strong>{{ ride.preferred_time|date:"M d, Y - h:i A" }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Passengers</small>
+                            <strong>{{ ride.number_of_passengers }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Estimated Distance</small>
+                            <strong>{{ ride.estimated_distance_km }} km</strong>
+                        </div>
+
+                        <div>
+                            <small>Estimated Fare</small>
+                            <strong>₦{{ ride.estimated_fare }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {% if ride.driver %}
+                    <div class="tracking-box">
+                        <div class="tracking-header">
+                            <div>
+                                <span class="section-label">Driver Tracking</span>
+                                <h3>{{ tracking_title }}</h3>
+                            </div>
+
+                            <span class="tracking-eta">
+                                {% if tracking_eta > 0 %}
+                                    ETA: {{ tracking_eta }} mins
+                                {% else %}
+                                    ETA: Done
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="tracking-map">
+                            <div class="map-location driver-location">
+                                <span></span>
+                                <strong>{{ tracking_from_label }}</strong>
+                                <small>{{ tracking_from_value }}</small>
+                            </div>
+
+                            <div class="map-road">
+                                <div
+                                    class="map-road-progress"
+                                    data-progress="{{ driver_progress_percent }}"
+                                ></div>
+                            </div>
+
+                            <div class="map-location pickup-location">
+                                <span></span>
+                                <strong>{{ tracking_to_label }}</strong>
+                                <small>{{ tracking_to_value }}</small>
+                            </div>
+                        </div>
+
+                        <div class="tracking-details">
+                            <div>
+                                <small>{{ tracking_from_label }}</small>
+                                <strong>{{ tracking_from_value }}</strong>
+                            </div>
+
+                            <div>
+                                <small>{{ tracking_to_label }}</small>
+                                <strong>{{ tracking_to_value }}</strong>
+                            </div>
+
+                            <div>
+                                <small>Remaining Distance</small>
+                                <strong>{{ tracking_distance }} km</strong>
+                            </div>
+
+                            <div>
+                                <small>Estimated Time</small>
+                                {% if tracking_eta > 0 %}
+                                    <strong>{{ tracking_eta }} minutes</strong>
+                                {% else %}
+                                    <strong>Completed</strong>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Payment</span>
+                        <h2>Payment Information</h2>
+                    </div>
+                </div>
+
+                {% if ride.payment %}
+                    <div class="ride-details">
+                        <div>
+                            <small>Amount</small>
+                            <strong>₦{{ ride.payment.amount }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Method</small>
+                            <strong>{{ ride.payment.get_method_display }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Status</small>
+                            <strong>{{ ride.payment.get_status_display }}</strong>
+                        </div>
+                    </div>
+
+                    {% if ride.payment.status != "paid" and ride.payment.status != "cancelled" %}
+                        <div class="ride-actions">
+                            <a href="{% url 'student_payment' ride.id %}" class="btn btn-primary">Confirm Payment</a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p>No payment record found.</p>
+                    <div class="ride-actions">
+                        <a href="{% url 'student_payment' ride.id %}" class="btn btn-primary">Create Payment Record</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <aside class="side-column">
+            <div class="panel">
+                <span class="section-label">Assigned Driver</span>
+
+                {% if ride.driver %}
+                    <div class="profile-card">
+                        <div class="large-avatar">
+                            {{ ride.driver.user.first_name|first|default:ride.driver.user.username|first }}
+                        </div>
+
+                        <h3>{{ ride.driver.user.get_full_name }}</h3>
+                        <p>{{ ride.driver.keke_plate_number }}</p>
+                    </div>
+
+                    <div class="profile-meta">
+                        <div>
+                            <small>Phone Number</small>
+                            <strong>{{ ride.driver.phone_number }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Current Location</small>
+                            <strong>{{ ride.driver.current_location }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Vehicle Color</small>
+                            <strong>{{ ride.driver.vehicle_color }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Driver Rating</small>
+                            <strong>{{ ride.driver.average_rating }}/5</strong>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-state small">
+                        <h3>No driver assigned</h3>
+                        <p>Please wait while the system assigns a driver.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="panel safety-panel">
+                <span class="section-label">Safety Reminder</span>
+                <h3>Confirm before boarding</h3>
+                <p>
+                    Check the driver's name, phone number, and Keke plate number before entering the vehicle.
+                </p>
+            </div>
+        </aside>
+    </div>
+</section>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.map-road-progress[data-progress]').forEach(function (el) {
+        var v = el.getAttribute('data-progress') || 0;
+        el.style.width = v + "%";
+    });
+});
+</script>
+{% endblock %}

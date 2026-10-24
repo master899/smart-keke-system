@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner booking-banner">
+        <div>
+            <span class="section-label">Payments</span>
+            <h1>Your payment records</h1>
+            <p>
+                View fare amount, payment method, payment status, and confirm pending ride payments.
+            </p>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Transactions</span>
+                <h2>Payment History</h2>
+            </div>
+
+            <span class="pill">{{ rides.count }} Record(s)</span>
+        </div>
+
+        {% if rides %}
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Ride</th>
+                            <th>Driver</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for ride in rides %}
+                            <tr>
+                                <td>
+                                    <strong>{{ ride.pickup_location }}</strong>
+                                    <small>to {{ ride.destination }}</small>
+                                </td>
+
+                                <td>
+                                    {% if ride.driver %}
+                                        <strong>{{ ride.driver.user.get_full_name }}</strong>
+                                        <small>{{ ride.driver.keke_plate_number }}</small>
+                                    {% else %}
+                                        <strong>Not assigned</strong>
+                                        <small>Pending</small>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <strong>₦{{ ride.estimated_fare }}</strong>
+                                    <small>Fare estimate</small>
+                                </td>
+
+                                <td>
+                                    <strong>{{ ride.get_payment_method_display }}</strong>
+                                    <small>Selected method</small>
+                                </td>
+
+                                <td>
+                                    {% if ride.payment %}
+                                        <span class="status-badge {{ ride.payment.status }}">
+                                            {{ ride.payment.get_status_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge pending">No Record</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <strong>{{ ride.date_booked|date:"M d, Y" }}</strong>
+                                    <small>{{ ride.date_booked|date:"h:i A" }}</small>
+                                </td>
+
+                                <td>
+                                    <a href="{% url 'ride_detail' ride.id %}" class="table-link">View</a>
+
+                                    {% if ride.payment %}
+                                        {% if ride.payment.status == "pending" %}
+                                            <a href="{% url 'student_payment' ride.id %}" class="table-link pay-link">Confirm</a>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if ride.status != "cancelled" %}
+                                            <a href="{% url 'student_payment' ride.id %}" class="table-link pay-link">Confirm</a>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No payment records yet</h3>
+                <p>Your ride payment records will appear here after you book a ride.</p>
+                <a href="{% url 'book_ride' %}" class="btn btn-primary">Book a Ride</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.venv/
+venv/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Local databases and data exports
+db.sqlite3
+db.sqlite3-*
+db.sqlite3.sql
+
+# User uploads and collected static assets
+media/*
+!media/.gitkeep
+staticfiles/
+
+# Test and tooling output
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Keke System{% endblock %}</title>
+   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3">
+   <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+</head>
+<body>
+
+<div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-mark">SK</div>
+            <div>
+                <h2>Smart Keke</h2>
+                <p>FULafia Transport</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="{% url 'home' %}" class="sidebar-link">
+                <span class="link-dot"></span>
+                Home
+            </a>
+
+            {% if request.user.is_authenticated %}
+
+                {% if request.user.is_superuser or request.user.is_staff %}
+                    <a href="{% url 'system_admin_dashboard' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Admin Dashboard
+                    </a>
+
+                    <a href="{% url 'admin_students' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Students
+                    </a>
+
+                    <a href="{% url 'admin_drivers' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Drivers
+                    </a>
+
+                    <a href="{% url 'admin_rides' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Ride Bookings
+                    </a>
+
+                    <a href="{% url 'admin_payments' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Payments
+                    </a>
+
+                    <a href="{% url 'admin_reports' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Reports
+                    </a>
+
+                {% elif request.user.driver_profile %}
+                    <a href="{% url 'driver_dashboard' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Driver Dashboard
+                    </a>
+
+                    <a href="{% url 'driver_ride_history' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Ride History
+                    </a>
+
+                    <a href="{% url 'driver_notifications' %}" class="sidebar-link notification-menu-link">
+                        <span class="link-dot"></span>
+                        <span class="menu-text">Notifications</span>
+
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notification-count">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="{% url 'driver_profile' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Profile
+                    </a>
+
+                {% else %}
+                    <a href="{% url 'student_dashboard' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Student Dashboard
+                    </a>
+
+                    <a href="{% url 'book_ride' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Book Ride
+                    </a>
+
+                    <a href="{% url 'student_ride_history' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Ride History
+                    </a>
+
+                    <a href="{% url 'student_payments' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Payments
+                    </a>
+
+                    <a href="{% url 'student_notifications' %}" class="sidebar-link notification-menu-link">
+                        <span class="link-dot"></span>
+                        <span class="menu-text">Notifications</span>
+
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notification-count">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="{% url 'student_profile' %}" class="sidebar-link">
+                        <span class="link-dot"></span>
+                        Profile
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'logout' %}" class="sidebar-link logout-link">
+                    <span class="link-dot"></span>
+                    Logout
+                </a>
+
+            {% else %}
+                <a href="{% url 'login' %}" class="sidebar-link">
+                    <span class="link-dot"></span>
+                    Login
+                </a>
+
+                <a href="{% url 'register' %}" class="sidebar-link">
+                    <span class="link-dot"></span>
+                    Register
+                </a>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-card">
+            <span>Campus Safety</span>
+            <p>Only verified students and approved drivers can use the platform.</p>
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <section class="main-section">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="topbar-heading">
+                <h3>Smart Campus Transport Booking System</h3>
+                <p>Secure Keke Napep ride booking for FULafia students</p>
+            </div>
+
+            <div class="topbar-profile">
+                {% if request.user.is_authenticated %}
+                    <div class="profile-initial">
+                        {{ request.user.first_name|first|default:request.user.username|first }}
+                    </div>
+                    <div>
+                        <strong>{{ request.user.first_name|default:request.user.username }}</strong>
+                        <small>Online</small>
+                    </div>
+                {% else %}
+                    <div class="profile-initial">G</div>
+                    <div>
+                        <strong>Guest</strong>
+                        <small>Not logged in</small>
+                    </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <main class="content-area">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </section>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/main.js' %}?v=5"></script>
+</body>
+</body>
+</html>

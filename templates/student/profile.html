@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Profile | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Student Profile</span>
+            <h1>Manage your account</h1>
+            <p>
+                Keep your contact details updated for safer and easier campus ride coordination.
+            </p>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="dashboard-columns">
+        <div class="main-column">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Profile Form</span>
+                        <h2>Update Information</h2>
+                    </div>
+                </div>
+
+                <form method="POST" class="auth-form">
+                    {% csrf_token %}
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" class="form-control" value="{{ request.user.email }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" name="phone_number" class="form-control" value="{{ student.phone_number }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Level</label>
+                            <input type="text" name="level" class="form-control" value="{{ student.level }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Hostel/Lodge</label>
+                            <input type="text" name="hostel_or_lodge" class="form-control" value="{{ student.hostel_or_lodge }}">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary full-width">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <aside class="side-column">
+            <div class="panel">
+                <span class="section-label">Account Summary</span>
+
+                <div class="profile-card">
+                    <div class="large-avatar">
+                        {{ request.user.first_name|first|default:request.user.username|first }}
+                    </div>
+
+                    <h3>{{ request.user.get_full_name }}</h3>
+                    <p>{{ student.department }}</p>
+                </div>
+
+                <div class="profile-meta">
+                    <div>
+                        <small>Matric Number</small>
+                        <strong>{{ student.matric_number }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Department</small>
+                        <strong>{{ student.department }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Verification</small>
+                        {% if student.is_verified %}
+                            <strong class="status-success">Verified</strong>
+                        {% else %}
+                            <strong class="status-warning">Pending</strong>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

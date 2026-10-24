@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Driver Dashboard | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Driver Dashboard</span>
+            <h1>Welcome, {{ request.user.first_name }}</h1>
+            <p>
+                View assigned rides, update trip progress, share GPS location, and manage your Keke availability.
+            </p>
+        </div>
+
+        <div class="banner-action">
+            <a href="{% url 'driver_toggle_availability' %}" class="btn btn-primary">
+                {% if driver.is_available %}
+                    Go Offline
+                {% else %}
+                    Go Online
+                {% endif %}
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="overview-grid">
+        <article class="overview-card">
+            <span class="card-label">Driver ID</span>
+            <h3>{{ driver.driver_id }}</h3>
+            <p>Registered driver identity</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Keke Plate Number</span>
+            <h3>{{ driver.keke_plate_number }}</h3>
+            <p>Assigned vehicle information</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Availability</span>
+            {% if driver.is_available %}
+                <h3 class="status-success">Available</h3>
+                <p>You can receive new ride requests</p>
+            {% else %}
+                <h3 class="status-warning">Busy</h3>
+                <p>You currently have an assigned ride</p>
+            {% endif %}
+        </article>
+
+        <article class="overview-card highlight-card">
+            <span class="card-label">Completed Rides</span>
+            <h3>{{ driver.total_completed_rides }}</h3>
+            <p>Total completed trips</p>
+        </article>
+    </div>
+
+    <div class="dashboard-columns">
+        <div class="main-column">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Assigned Trips</span>
+                        <h2>Active Ride Requests</h2>
+                    </div>
+                    <span class="pill">{{ active_rides.count }} Active</span>
+                </div>
+
+                {% if active_rides %}
+                    <div class="ride-list">
+                        {% for ride in active_rides %}
+                            <div class="driver-ride-card">
+                                <div class="ride-list-item">
+                                    <div>
+                                        <strong>{{ ride.pickup_location }} → {{ ride.destination }}</strong>
+                                        <small>
+                                            Student: {{ ride.student.user.get_full_name }} |
+                                            Phone: {{ ride.student.phone_number }}
+                                        </small>
+                                    </div>
+
+                                    <span class="ride-status">{{ ride.get_status_display }}</span>
+                                </div>
+
+                                <div class="driver-actions">
+                                    <a href="{% url 'ride_detail' ride.id %}" class="btn btn-secondary">View Details</a>
+
+                                    {% if ride.status == "assigned" %}
+                                        <a href="{% url 'update_ride_status' ride.id 'arriving' %}" class="btn btn-primary">
+                                            Mark Arriving
+                                        </a>
+                                    {% endif %}
+
+                                    {% if ride.status == "arriving" %}
+                                        <a href="{% url 'update_ride_status' ride.id 'in_transit' %}" class="btn btn-primary">
+                                            Start Trip
+                                        </a>
+                                    {% endif %}
+
+                                    {% if ride.status == "in_transit" %}
+                                        <a href="{% url 'update_ride_status' ride.id 'completed' %}" class="btn btn-primary">
+                                            Complete Trip
+                                        </a>
+                                    {% endif %}
+
+                                    <a href="{% url 'update_ride_status' ride.id 'cancelled' %}" class="btn btn-danger">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>No active ride assigned</h3>
+                        <p>New student booking requests will appear here when assigned to you.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <aside class="side-column">
+            <div class="panel">
+                <span class="section-label">Driver Profile</span>
+
+                <div class="profile-card">
+                    <div class="large-avatar">
+                        {{ request.user.first_name|first|default:request.user.username|first }}
+                    </div>
+
+                    <h3>{{ request.user.get_full_name }}</h3>
+                    <p>{{ driver.current_location }}</p>
+                </div>
+
+                <div class="profile-meta">
+                    <div>
+                        <small>Phone</small>
+                        <strong>{{ driver.phone_number }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Vehicle Color</small>
+                        <strong>{{ driver.vehicle_color }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Rating</small>
+                        <strong>{{ driver.average_rating }}/5</strong>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

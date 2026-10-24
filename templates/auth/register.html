@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Register | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-card large">
+        <div class="auth-header">
+            <span class="keke-badge">Student Registration</span>
+            <h1>Create your account</h1>
+            <p>Register with your student details to book verified campus Keke rides.</p>
+        </div>
+
+        {% if messages %}
+            <div class="message-box">
+                {% for message in messages %}
+                    <p class="message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>First Name</label>
+                    {{ form.first_name }}
+                    {{ form.first_name.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Last Name</label>
+                    {{ form.last_name }}
+                    {{ form.last_name.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Matric Number</label>
+                    {{ form.matric_number }}
+                    {{ form.matric_number.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Department</label>
+                    {{ form.department }}
+                    {{ form.department.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Level</label>
+                    {{ form.level }}
+                    {{ form.level.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    {{ form.phone_number }}
+                    {{ form.phone_number.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Hostel/Lodge</label>
+                    {{ form.hostel_or_lodge }}
+                    {{ form.hostel_or_lodge.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    {{ form.password }}
+                    {{ form.password.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    {{ form.confirm_password }}
+                    {{ form.confirm_password.errors }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary full-width">Create Account</button>
+        </form>
+
+        <p class="auth-switch">
+            Already have an account?
+            <a href="{% url 'login' %}">Login here</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Students | Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Students Management</span>
+            <h1>Registered Students</h1>
+            <p>View verified student accounts allowed to book campus Keke rides.</p>
+        </div>
+    </div>
+
+    <div class="panel history-filter-panel">
+        <form method="GET" class="filter-form">
+            <div class="form-group">
+                <label>Search Student</label>
+                <input type="text" name="q" class="form-control" value="{{ search_query }}" placeholder="Name, matric number, department, phone">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a href="{% url 'admin_students' %}" class="btn btn-secondary">Reset</a>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Students</span>
+                <h2>Student Records</h2>
+            </div>
+            <span class="pill">{{ students.count }} Record(s)</span>
+        </div>
+
+        {% if students %}
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Matric Number</th>
+                            <th>Department</th>
+                            <th>Level</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td>
+                                    <strong>{{ student.user.get_full_name }}</strong>
+                                    <small>{{ student.user.email }}</small>
+                                </td>
+                                <td><strong>{{ student.matric_number }}</strong></td>
+                                <td><strong>{{ student.department }}</strong></td>
+                                <td><strong>{{ student.level|default:"N/A" }}</strong></td>
+                                <td><strong>{{ student.phone_number }}</strong></td>
+                                <td>
+                                    {% if student.is_verified %}
+                                        <span class="status-badge paid">Verified</span>
+                                    {% else %}
+                                        <span class="status-badge pending">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No students found</h3>
+                <p>No student record matches your search.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

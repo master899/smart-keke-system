@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments | Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner booking-banner">
+        <div>
+            <span class="section-label">Payment Management</span>
+            <h1>Payment Records</h1>
+            <p>View ride payment status, fare amount, selected method, and transaction records.</p>
+        </div>
+    </div>
+
+    <div class="panel history-filter-panel">
+        <form method="GET" class="filter-form">
+            <div class="form-group">
+                <label>Search Payment</label>
+                <input type="text" name="q" class="form-control" value="{{ search_query }}" placeholder="Student, driver, matric number, reference">
+            </div>
+
+            <div class="form-group">
+                <label>Payment Status</label>
+                <select name="status" class="form-control">
+                    <option value="">All Payments</option>
+                    {% for value, label in payment_status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Apply</button>
+            <a href="{% url 'admin_payments' %}" class="btn btn-secondary">Reset</a>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Transactions</span>
+                <h2>Payment Records</h2>
+            </div>
+            <span class="pill">{{ payments.count }} Record(s)</span>
+        </div>
+
+        {% if payments %}
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Driver</th>
+                            <th>Route</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for payment in payments %}
+                            <tr>
+                                <td>
+                                    <strong>{{ payment.ride.student.user.get_full_name }}</strong>
+                                    <small>{{ payment.ride.student.matric_number }}</small>
+                                </td>
+
+                                <td>
+                                    {% if payment.ride.driver %}
+                                        <strong>{{ payment.ride.driver.user.get_full_name }}</strong>
+                                        <small>{{ payment.ride.driver.keke_plate_number }}</small>
+                                    {% else %}
+                                        <strong>Not assigned</strong>
+                                        <small>Pending</small>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <strong>{{ payment.ride.pickup_location }}</strong>
+                                    <small>to {{ payment.ride.destination }}</small>
+                                </td>
+
+                                <td><strong>₦{{ payment.amount }}</strong></td>
+
+                                <td><strong>{{ payment.get_method_display }}</strong></td>
+
+                                <td>
+                                    <span class="status-badge {{ payment.status }}">{{ payment.get_status_display }}</span>
+                                </td>
+
+                                <td>
+                                    <strong>{{ payment.date_created|date:"M d, Y" }}</strong>
+                                    <small>{{ payment.date_created|date:"h:i A" }}</small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No payments found</h3>
+                <p>No payment record matches your filter.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

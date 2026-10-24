@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Driver Ride History | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Driver Ride History</span>
+            <h1>Your assigned ride records</h1>
+            <p>
+                Review completed, cancelled, and active Keke ride requests assigned to you.
+            </p>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="panel history-filter-panel">
+        <form method="GET" class="filter-form">
+            <div class="form-group">
+                <label>Filter by Status</label>
+                <select name="status" class="form-control">
+                    <option value="">All Rides</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Apply Filter</button>
+            <a href="{% url 'driver_ride_history' %}" class="btn btn-secondary">Reset</a>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Assigned Rides</span>
+                <h2>Ride Records</h2>
+            </div>
+
+            <span class="pill">{{ rides.count }} Record(s)</span>
+        </div>
+
+        {% if rides %}
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Route</th>
+                            <th>Fare</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for ride in rides %}
+                            <tr>
+                                <td>
+                                    <strong>{{ ride.student.user.get_full_name }}</strong>
+                                    <small>{{ ride.student.phone_number }}</small>
+                                </td>
+
+                                <td>
+                                    <strong>{{ ride.pickup_location }}</strong>
+                                    <small>to {{ ride.destination }}</small>
+                                </td>
+
+                                <td>
+                                    <strong>₦{{ ride.estimated_fare }}</strong>
+                                    <small>{{ ride.estimated_distance_km }} km</small>
+                                </td>
+
+                                <td>
+                                    {% if ride.payment %}
+                                        <span class="status-badge {{ ride.payment.status }}">
+                                            {{ ride.payment.get_status_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge pending">No Record</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <span class="status-badge {{ ride.status }}">
+                                        {{ ride.get_status_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <strong>{{ ride.date_booked|date:"M d, Y" }}</strong>
+                                    <small>{{ ride.date_booked|date:"h:i A" }}</small>
+                                </td>
+
+                                <td>
+                                    <a href="{% url 'ride_detail' ride.id %}" class="table-link">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No ride records yet</h3>
+                <p>Assigned ride requests will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

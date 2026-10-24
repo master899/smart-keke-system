@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">System Administration</span>
+            <h1>Admin Dashboard</h1>
+            <p>
+                Monitor students, drivers, ride bookings, payments, and transport activities across the system.
+            </p>
+        </div>
+
+        <div class="banner-action">
+            <a href="{% url 'admin_reports' %}" class="btn btn-primary">View Reports</a>
+        </div>
+    </div>
+
+    <div class="admin-stats-grid">
+        <article class="overview-card">
+            <span class="card-label">Students</span>
+            <h3>{{ total_students }}</h3>
+            <p>{{ verified_students }} verified accounts</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Drivers</span>
+            <h3>{{ total_drivers }}</h3>
+            <p>{{ verified_drivers }} verified drivers</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Available Drivers</span>
+            <h3 class="status-success">{{ available_drivers }}</h3>
+            <p>{{ busy_drivers }} busy/offline</p>
+        </article>
+
+        <article class="overview-card highlight-card">
+            <span class="card-label">Total Revenue</span>
+            <h3>₦{{ total_revenue }}</h3>
+            <p>Confirmed paid rides</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Total Rides</span>
+            <h3>{{ total_rides }}</h3>
+            <p>All ride requests</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Active Rides</span>
+            <h3>{{ active_rides }}</h3>
+            <p>Pending/assigned/in transit</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Completed Rides</span>
+            <h3 class="status-success">{{ completed_rides }}</h3>
+            <p>Successfully completed</p>
+        </article>
+
+        <article class="overview-card">
+            <span class="card-label">Cancelled Rides</span>
+            <h3 class="status-warning">{{ cancelled_rides }}</h3>
+            <p>Terminated requests</p>
+        </article>
+    </div>
+
+    <div class="dashboard-columns">
+        <div class="main-column">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Recent Rides</span>
+                        <h2>Latest Bookings</h2>
+                    </div>
+                    <a href="{% url 'admin_rides' %}" class="text-link">View all</a>
+                </div>
+
+                {% if recent_rides %}
+                    <div class="ride-list">
+                        {% for ride in recent_rides %}
+                            <div class="ride-list-item">
+                                <div>
+                                    <strong>{{ ride.student.user.get_full_name }}</strong>
+                                    <small>{{ ride.pickup_location }} to {{ ride.destination }}</small>
+                                </div>
+                                <span class="ride-status">{{ ride.get_status_display }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state small">
+                        <h3>No recent rides</h3>
+                        <p>Ride bookings will appear here.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <aside class="side-column">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-label">Payments</span>
+                        <h2>Payment Summary</h2>
+                    </div>
+                </div>
+
+                <div class="profile-meta">
+                    <div>
+                        <small>Paid Payments</small>
+                        <strong class="status-success">{{ paid_payments }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Pending Payments</small>
+                        <strong class="status-warning">{{ pending_payments }}</strong>
+                    </div>
+
+                    <div>
+                        <small>Cancelled Payments</small>
+                        <strong>{{ cancelled_payments }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel safety-panel">
+                <span class="section-label">Admin Control</span>
+                <h3>System monitoring</h3>
+                <p>
+                    Use the management pages to monitor students, drivers, rides, payments, and performance trends.
+                </p>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

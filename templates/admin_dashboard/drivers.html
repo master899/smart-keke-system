@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Drivers | Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner">
+        <div>
+            <span class="section-label">Drivers Management</span>
+            <h1>Keke Drivers</h1>
+            <p>Monitor verified drivers, vehicle details, availability, and current location.</p>
+        </div>
+    </div>
+
+    <div class="panel history-filter-panel">
+        <form method="GET" class="filter-form">
+            <div class="form-group">
+                <label>Search Driver</label>
+                <input type="text" name="q" class="form-control" value="{{ search_query }}" placeholder="Name, driver ID, plate number, location">
+            </div>
+
+            <div class="form-group">
+                <label>Availability</label>
+                <select name="availability" class="form-control">
+                    <option value="">All Drivers</option>
+                    <option value="available" {% if availability_filter == "available" %}selected{% endif %}>Available</option>
+                    <option value="busy" {% if availability_filter == "busy" %}selected{% endif %}>Busy/Offline</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Apply</button>
+            <a href="{% url 'admin_drivers' %}" class="btn btn-secondary">Reset</a>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="section-label">Drivers</span>
+                <h2>Driver Records</h2>
+            </div>
+            <span class="pill">{{ drivers.count }} Record(s)</span>
+        </div>
+
+        {% if drivers %}
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Driver</th>
+                            <th>Driver ID</th>
+                            <th>Plate Number</th>
+                            <th>Location</th>
+                            <th>Completed Rides</th>
+                            <th>Status</th>
+                            <th>Verification</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for driver in drivers %}
+                            <tr>
+                                <td>
+                                    <strong>{{ driver.user.get_full_name }}</strong>
+                                    <small>{{ driver.phone_number }}</small>
+                                </td>
+                                <td><strong>{{ driver.driver_id }}</strong></td>
+                                <td><strong>{{ driver.keke_plate_number }}</strong></td>
+                                <td>
+                                    <strong>{{ driver.current_location }}</strong>
+                                    <small>
+                                        {% if driver.current_latitude and driver.current_longitude %}
+                                            GPS active
+                                        {% else %}
+                                            GPS not updated
+                                        {% endif %}
+                                    </small>
+                                </td>
+                                <td><strong>{{ driver.total_completed_rides }}</strong></td>
+                                <td>
+                                    {% if driver.is_available %}
+                                        <span class="status-badge paid">Available</span>
+                                    {% else %}
+                                        <span class="status-badge pending">Busy/Offline</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if driver.is_verified %}
+                                        <span class="status-badge paid">Verified</span>
+                                    {% else %}
+                                        <span class="status-badge pending">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No drivers found</h3>
+                <p>No driver record matches your search.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

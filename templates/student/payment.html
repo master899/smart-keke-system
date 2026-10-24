@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment | Smart Keke System{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="welcome-banner booking-banner">
+        <div>
+            <span class="section-label">Payment Confirmation</span>
+            <h1>Confirm your ride payment</h1>
+            <p>
+                Review your ride fare and payment method before confirming payment.
+            </p>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="message-box">
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="payment-layout">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <span class="section-label">Ride Summary</span>
+                    <h2>Payment Details</h2>
+                </div>
+                <span class="pill">Ride #{{ ride.id }}</span>
+            </div>
+
+            <div class="payment-summary">
+                <div>
+                    <small>Pickup Location</small>
+                    <strong>{{ ride.pickup_location }}</strong>
+                </div>
+
+                <div>
+                    <small>Destination</small>
+                    <strong>{{ ride.destination }}</strong>
+                </div>
+
+                <div>
+                    <small>Assigned Driver</small>
+                    {% if ride.driver %}
+                        <strong>{{ ride.driver.user.get_full_name }}</strong>
+                    {% else %}
+                        <strong>Not assigned</strong>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <small>Keke Plate Number</small>
+                    {% if ride.driver %}
+                        <strong>{{ ride.driver.keke_plate_number }}</strong>
+                    {% else %}
+                        <strong>N/A</strong>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <small>Payment Method</small>
+                    <strong>{{ ride.get_payment_method_display }}</strong>
+                </div>
+
+                <div>
+                    <small>Payment Status</small>
+                    {% if ride.payment %}
+                        <strong>{{ ride.payment.get_status_display }}</strong>
+                    {% else %}
+                        <strong>Pending</strong>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="fare-box">
+                <span>Total Fare</span>
+                <strong>₦{{ ride.estimated_fare }}</strong>
+            </div>
+
+            {% if ride.payment and ride.payment.status == "paid" %}
+                <div class="empty-state small">
+                    <h3>Payment already confirmed</h3>
+                    <p>This ride payment has already been marked as paid.</p>
+                    <a href="{% url 'ride_detail' ride.id %}" class="btn btn-primary">Back to Ride Details</a>
+                </div>
+            {% else %}
+                <form method="POST" class="payment-confirm-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary full-width">Confirm Payment</button>
+                </form>
+            {% endif %}
+        </div>
+
+        <aside class="panel safety-panel">
+            <span class="section-label">Payment Note</span>
+            <h3>Demo payment confirmation</h3>
+            <p>
+                For this final-year system, payment confirmation is recorded inside the database.
+                Online payment gateway integration can be added later.
+            </p>
+        </aside>
+    </div>
+</section>
+{% endblock %}
