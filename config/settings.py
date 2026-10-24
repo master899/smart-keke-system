@@ -27,6 +27,9 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+if os.getenv("VERCEL") == "1":
+    ALLOWED_HOSTS.append(".vercel.app")
+
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
