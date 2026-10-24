@@ -1,3 +1,8 @@
+
 Django>=5.2,<5.3
 Pillow>=11,<13
 python-dotenv>=1,<2
+gunicorn>=23,<24
+whitenoise>=6.9,<7
+dj-database-url>=2.3,<4
+psycopg2-binary>=2.9,<3
